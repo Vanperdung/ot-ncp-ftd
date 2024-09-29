@@ -1,0 +1,47 @@
+# Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+project_name: ot-ncp-ftd_2
+label: ot-ncp-ftd_2
+description: |
+  This is a simple OpenThread Full Thread Device NCP application. This is equivalent to the ot-ncp-ftd application in the OpenThread GitHub repo.
+category: OpenThread Examples
+filter:
+- name: Device Type
+  value: [NCP]
+- name: Project Difficulty
+  value: [Advanced]
+- name: Wireless Technology
+  value: [Thread]
+package: OpenThread
+quality: production
+readme:
+- {path: README-OT-NCP.md}
+- {path: README-OT-NCP.md}
+source:
+- {path: main.c}
+- {path: app.c}
+tag: [prebuilt_demo]
+include:
+- path: .
+  file_list:
+  - {path: app.h}
+  - {path: reset_util.h}
+sdk: {id: gecko_sdk, version: 4.1.6}
+toolchain_settings: []
+component:
+- {id: EFR32MG21A020F1024IM32}
+- {id: brd4001a}
+- {id: brd4180b}
+- {id: ot_ncp_source}
+- {id: ot_reference_device}
+- {id: ot_stack_ftd}
+- {id: rail_util_pti}
+- instance: [vcom]
+  id: uartdrv_usart
+configuration:
+- {name: SL_BOARD_ENABLE_VCOM, value: '1'}
+- {name: SL_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED, value: '1'}
+- {name: SL_MBEDTLS_KEY_EXCHANGE_PSK_ENABLED, value: '1'}
+ui_hints:
+  highlight:
+  - {path: ./README-OT-NCP.md, focus: true}
+
