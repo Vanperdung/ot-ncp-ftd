@@ -1090,6 +1090,10 @@ otError NcpBase::HandleCommand(uint8_t aHeader)
         break;
 #endif // OPENTHREAD_MTD || OPENTHREAD_FTD
 
+    case SPINEL_CMD_SGC_REQUEST_SLEEP:
+        error = CommandHandler_SLEEP_REQUEST(aHeader);
+        break;
+
     default:
 
 #if OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
@@ -1356,6 +1360,11 @@ exit:
 // ----------------------------------------------------------------------------
 // MARK: Individual Command Handlers
 // ----------------------------------------------------------------------------
+
+otError NcpBase::CommandHandler_SLEEP_REQUEST(uint8_t aHeader)
+{
+    return PrepareLastStatusResponse(aHeader, SPINEL_CMD_SGC_REQUEST_SLEEP_RET);
+}
 
 otError NcpBase::CommandHandler_NOOP(uint8_t aHeader)
 {

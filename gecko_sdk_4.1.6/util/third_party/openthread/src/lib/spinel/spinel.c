@@ -1191,6 +1191,8 @@ const char *spinel_command_to_cstr(spinel_command_t command)
         {SPINEL_CMD_PROP_VALUE_MULTI_GET, "PROP_VALUE_MULTI_GET"},
         {SPINEL_CMD_PROP_VALUE_MULTI_SET, "PROP_VALUE_MULTI_SET"},
         {SPINEL_CMD_PROP_VALUES_ARE, "PROP_VALUES_ARE"},
+        {SPINEL_CMD_SGC_REQUEST_SLEEP, "REQUESTS_SLEEP"},
+        {SPINEL_CMD_SGC_REQUEST_SLEEP_RET, "REQUESTS_SLEEP_RET"},
         {0, NULL},
     };
 
