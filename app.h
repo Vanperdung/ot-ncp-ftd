@@ -18,6 +18,14 @@
 #ifndef APP_H
 #define APP_H
 
+#include <openthread/instance.h>
+
+#define UDP_PORT 5000
+#define MULTICAST_ADDR "ff03::1"
+#define REQUEST_SLEEP_MESSAGE "sleep"
+#define ACK "ack"
+#define NACK "nack"
+
 /**************************************************************************//**
  * Application Init.
  *****************************************************************************/
@@ -32,5 +40,7 @@ void app_exit(void);
  * Application Process Action.
  *****************************************************************************/
 void app_process_action(void);
+
+otInstance *otGetInstance(void);
 
 #endif

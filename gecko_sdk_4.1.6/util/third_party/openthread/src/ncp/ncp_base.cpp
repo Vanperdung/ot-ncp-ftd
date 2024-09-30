@@ -52,6 +52,12 @@
 #include "mac/sub_mac.hpp"
 #include "radio/radio.hpp"
 
+#include <openthread/udp.h>
+#include "../../../../app.h"
+
+extern otUdpSocket sUdpSocket;
+extern otInstance* gInstance;
+
 namespace ot {
 namespace Ncp {
 
@@ -1363,7 +1369,39 @@ exit:
 
 otError NcpBase::CommandHandler_SLEEP_REQUEST(uint8_t aHeader)
 {
-    return PrepareLastStatusResponse(aHeader, SPINEL_CMD_SGC_REQUEST_SLEEP_RET);
+    otError  parseError    = OT_ERROR_NONE;
+    otError  responseError    = OT_ERROR_NONE;
+    otMessage       *message = NULL;
+    const otIp6Address *address;
+    otMessageInfo    messageInfo;
+
+    mDecoder.ReadIp6Address(address);
+
+    VerifyOrExit((message = otUdpNewMessage(gInstance, NULL)) != NULL);
+    memset(&messageInfo, 0, sizeof(messageInfo));
+    memcpy(&messageInfo.mPeerAddr, address, sizeof(otIp6Address));
+    messageInfo.mPeerPort = UDP_PORT;
+
+    SuccessOrExit(otMessageAppend(message, REQUEST_SLEEP_MESSAGE, (uint16_t)strlen(REQUEST_SLEEP_MESSAGE)));
+    SuccessOrExit(otUdpSend(gInstance, &sUdpSocket, message, &messageInfo));
+
+    
+
+    message = NULL;
+
+    SuccessOrExit(responseError = mEncoder.BeginFrame(aHeader, SPINEL_CMD_SGC_REQUEST_SLEEP_RET));
+    SuccessOrExit(responseError = mEncoder.WriteUint8(1));
+    SuccessOrExit(responseError = mEncoder.EndFrame());
+
+    return responseError;
+
+exit:
+    if (message != NULL)
+    {
+        otMessageFree(message);
+    }
+    responseError = PrepareLastStatusResponse(aHeader, ThreadErrorToSpinelStatus(parseError));
+    return responseError;
 }
 
 otError NcpBase::CommandHandler_NOOP(uint8_t aHeader)

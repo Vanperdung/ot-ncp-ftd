@@ -22,10 +22,20 @@
 #include <openthread/diag.h>
 #include <openthread/tasklet.h>
 
+#include <openthread/dataset_ftd.h>
+#include <openthread/instance.h>
+#include <openthread/message.h>
+#include <openthread/thread.h>
+#include <openthread/udp.h>
+#include <openthread/platform/logging.h>
+#include <common/code_utils.hpp>
+#include <common/logging.hpp>
+
 #include "openthread-system.h"
 #include "app.h"
 
 #include "reset_util.h"
+#include <string.h>
 
 /**
  * This function initializes the NCP app.
@@ -35,11 +45,14 @@
  */
 extern void otAppNcpInit(otInstance *aInstance);
 
-static otInstance* sInstance = NULL;
+otInstance* gInstance = NULL;
+otUdpSocket sUdpSocket;
+bool isCreateUDP = false;
+bool isSleep = false;
 
 otInstance *otGetInstance(void)
 {
-    return sInstance;
+    return gInstance;
 }
 
 void sl_ot_create_instance(void)
@@ -56,16 +69,16 @@ void sl_ot_create_instance(void)
     assert(otInstanceBuffer);
 
     // Initialize OpenThread with the buffer
-    sInstance = otInstanceInit(otInstanceBuffer, &otInstanceBufferLength);
+    gInstance = otInstanceInit(otInstanceBuffer, &otInstanceBufferLength);
 #else
-    sInstance = otInstanceInitSingle();
+    gInstance = otInstanceInitSingle();
 #endif
-    assert(sInstance);
+    assert(gInstance);
 }
 
 void sl_ot_ncp_init(void)
 {
-    otAppNcpInit(sInstance);
+    otAppNcpInit(gInstance);
 }
 
 /**************************************************************************//**
@@ -77,13 +90,80 @@ void app_init(void)
     OT_SETUP_RESET_JUMP(argv);
 }
 
+void receiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *aMessageInfo)
+{
+    OT_UNUSED_VARIABLE(aContext);
+    OT_UNUSED_VARIABLE(aMessageInfo);
+    uint8_t buf[64];
+    int     length;
+    otMessage       *message = NULL;
+    otMessageInfo    messageInfo;
+    
+    length = otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, sizeof(buf) - 1);
+    if (!strncmp(buf, REQUEST_SLEEP_MESSAGE, length) && !isSleep)
+    {
+
+        VerifyOrExit((message = otUdpNewMessage(otGetInstance(), NULL)) != NULL);
+        memset(&messageInfo, 0, sizeof(messageInfo));
+        memcpy(&messageInfo.mPeerAddr, &aMessageInfo->mPeerAddr, sizeof(otIp6Address));
+        messageInfo.mPeerPort = UDP_PORT;
+
+        SuccessOrExit(otMessageAppend(message, ACK, (uint16_t)strlen(ACK)));
+        SuccessOrExit(otUdpSend(otGetInstance(), &sUdpSocket, message, &messageInfo));
+
+        message = NULL;
+    }
+
+    
+
+exit:
+    if (message != NULL)
+    {
+        otMessageFree(message);
+    }
+    return;
+}
+
+void initUdp(void)
+{
+    otError    error;
+    otSockAddr bindAddr;
+
+    // Initialize bindAddr
+    memset(&bindAddr, 0, sizeof(bindAddr));
+    bindAddr.mPort = UDP_PORT;
+
+    // Open the socket
+    error = otUdpOpen(otGetInstance(), &sUdpSocket, receiveCallback, NULL);
+    if (error != OT_ERROR_NONE)
+    {
+        return;
+    }
+
+    // Bind to the socket. Close the socket if bind fails.
+    error = otUdpBind(otGetInstance(), &sUdpSocket, &bindAddr, OT_NETIF_THREAD);
+    if (error != OT_ERROR_NONE)
+    {
+        IgnoreReturnValue(otUdpClose(otGetInstance(), &sUdpSocket));
+        return;
+    }
+
+    isCreateUDP = true;
+}
+
+
 /**************************************************************************//**
  * Application Process Action.
  *****************************************************************************/
 void app_process_action(void)
 {
-    otTaskletsProcess(sInstance);
-    otSysProcessDrivers(sInstance);
+    otTaskletsProcess(gInstance);
+    otSysProcessDrivers(gInstance);
+    otDeviceRole role = otThreadGetDeviceRole(gInstance);
+    if ((role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER || role == OT_DEVICE_ROLE_LEADER) && (!isCreateUDP)) 
+    {
+        initUdp();  
+    } 
 }
 
 /**************************************************************************//**
@@ -91,7 +171,7 @@ void app_process_action(void)
  *****************************************************************************/
 void app_exit(void)
 {
-    otInstanceFinalize(sInstance);
+    otInstanceFinalize(gInstance);
 #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
     free(otInstanceBuffer);
 #endif
