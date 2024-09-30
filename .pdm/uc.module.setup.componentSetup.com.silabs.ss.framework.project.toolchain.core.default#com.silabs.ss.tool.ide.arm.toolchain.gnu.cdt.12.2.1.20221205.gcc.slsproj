@@ -98,6 +98,16 @@
             <file name="sl_debug_swo.h" linked="false" uri="studio:/sdk/platform/driver/debug/inc/sl_debug_swo.h"/>
           </folder>
         </folder>
+        <folder name="leddrv">
+          <folder name="src">
+            <file name="sl_led.c" linked="false" uri="studio:/sdk/platform/driver/leddrv/src/sl_led.c"/>
+            <file name="sl_simple_led.c" linked="false" uri="studio:/sdk/platform/driver/leddrv/src/sl_simple_led.c"/>
+          </folder>
+          <folder name="inc">
+            <file name="sl_led.h" linked="false" uri="studio:/sdk/platform/driver/leddrv/inc/sl_led.h"/>
+            <file name="sl_simple_led.h" linked="false" uri="studio:/sdk/platform/driver/leddrv/inc/sl_simple_led.h"/>
+          </folder>
+        </folder>
       </folder>
       <folder name="service">
         <folder name="device_init">
@@ -1334,11 +1344,11 @@
       </folder>
     </folder>
   </folder>
-  <file name="main.c" linked="false" uri="studio:/sdk/protocol/openthread/sample-apps/ot-ncp/main.c"/>
-  <file name="app.c" linked="false" uri="studio:/sdk/protocol/openthread/sample-apps/ot-ncp/app.c"/>
-  <file name="app.h" linked="false" uri="studio:/sdk/protocol/openthread/sample-apps/ot-ncp/app.h"/>
-  <file name="reset_util.h" linked="false" uri="studio:/sdk/util/third_party/openthread/src/lib/platform/reset_util.h"/>
-  <file name="README-OT-NCP.md" linked="false" uri="studio:/sdk/protocol/openthread/sample-apps/ot-ncp/README-OT-NCP.md"/>
+  <file name="main.c" linked="false" uri="studio:/project/main.c"/>
+  <file name="app.c" linked="false" uri="studio:/project/app.c"/>
+  <file name="app.h" linked="false" uri="studio:/project/app.h"/>
+  <file name="reset_util.h" linked="false" uri="studio:/project/reset_util.h"/>
+  <file name="README-OT-NCP.md" linked="false" uri="studio:/project/README-OT-NCP.md"/>
   <includePath uri="studio:/project/"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/Device/SiliconLabs/EFR32MG21/Include"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/common/inc"/>
@@ -1351,6 +1361,7 @@
   <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/emdrv/common/inc"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/emlib/inc"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/emdrv/gpiointerrupt/inc"/>
+  <includePath uri="studio:/project/gecko_sdk_4.1.6/platform/driver/leddrv/inc"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/util/third_party/crypto/mbedtls/include"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/util/third_party/crypto/mbedtls/library"/>
   <includePath uri="studio:/project/gecko_sdk_4.1.6/util/third_party/crypto/sl_component/sl_mbedtls_support/config"/>

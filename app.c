@@ -35,6 +35,8 @@
 #include "app.h"
 
 #include "reset_util.h"
+#include "sl_simple_led.h"
+#include "sl_simple_led_instances.h"
 #include <string.h>
 
 /**
@@ -49,6 +51,10 @@ otInstance* gInstance = NULL;
 otUdpSocket sUdpSocket;
 bool isCreateUDP = false;
 bool isSleep = false;
+
+#ifndef LED_INSTANCE
+#define LED_INSTANCE    sl_led_pwr
+#endif
 
 otInstance *otGetInstance(void)
 {
@@ -100,21 +106,36 @@ void receiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *a
     otMessageInfo    messageInfo;
     
     length = otMessageRead(aMessage, otMessageGetOffset(aMessage), buf, sizeof(buf) - 1);
-    if (!strncmp(buf, REQUEST_SLEEP_MESSAGE, length) && !isSleep)
+    if (!strncmp((char *)buf, REQUEST_SLEEP_MESSAGE, length) && !isSleep)
     {
-
         VerifyOrExit((message = otUdpNewMessage(otGetInstance(), NULL)) != NULL);
         memset(&messageInfo, 0, sizeof(messageInfo));
         memcpy(&messageInfo.mPeerAddr, &aMessageInfo->mPeerAddr, sizeof(otIp6Address));
         messageInfo.mPeerPort = UDP_PORT;
+
+        sl_led_turn_on(&LED_INSTANCE);
+        isSleep = true;
 
         SuccessOrExit(otMessageAppend(message, ACK, (uint16_t)strlen(ACK)));
         SuccessOrExit(otUdpSend(otGetInstance(), &sUdpSocket, message, &messageInfo));
 
         message = NULL;
     }
+    else if (!strncmp((char *)buf, REQUEST_WAKEUP_MESSAGE, length) && isSleep)
+    {
+        VerifyOrExit((message = otUdpNewMessage(otGetInstance(), NULL)) != NULL);
+        memset(&messageInfo, 0, sizeof(messageInfo));
+        memcpy(&messageInfo.mPeerAddr, &aMessageInfo->mPeerAddr, sizeof(otIp6Address));
+        messageInfo.mPeerPort = UDP_PORT;
 
-    
+        sl_led_turn_off(&LED_INSTANCE);
+        isSleep = false;
+
+        SuccessOrExit(otMessageAppend(message, ACK, (uint16_t)strlen(ACK)));
+        SuccessOrExit(otUdpSend(otGetInstance(), &sUdpSocket, message, &messageInfo));
+
+        message = NULL;
+    }
 
 exit:
     if (message != NULL)

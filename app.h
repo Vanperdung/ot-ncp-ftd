@@ -23,6 +23,7 @@
 #define UDP_PORT 5000
 #define MULTICAST_ADDR "ff03::1"
 #define REQUEST_SLEEP_MESSAGE "sleep"
+#define REQUEST_WAKEUP_MESSAGE "wakeup"
 #define ACK "ack"
 #define NACK "nack"
 

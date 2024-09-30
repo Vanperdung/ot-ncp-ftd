@@ -21,6 +21,7 @@
 #include "sl_mpu.h"
 #include "nvm3_default.h"
 #include "sl_ot_init.h"
+#include "sl_simple_led_instances.h"
 #include "sl_uartdrv_instances.h"
 #include "psa/crypto.h"
 #include "sli_protocol_crypto.h"
@@ -44,6 +45,7 @@ void sl_driver_init(void)
 {
   sl_debug_swo_init();
   GPIOINT_Init();
+  sl_simple_led_init_instances();
   sl_uartdrv_init_instances();
   sl_cos_send_config();
 }

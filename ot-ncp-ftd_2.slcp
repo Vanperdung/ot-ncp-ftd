@@ -35,6 +35,8 @@ component:
 - {id: ot_reference_device}
 - {id: ot_stack_ftd}
 - {id: rail_util_pti}
+- instance: [pwr]
+  id: simple_led
 - instance: [vcom]
   id: uartdrv_usart
 configuration:
