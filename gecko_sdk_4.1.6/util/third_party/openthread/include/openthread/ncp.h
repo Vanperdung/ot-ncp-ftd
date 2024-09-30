@@ -246,6 +246,8 @@ void otNcpHandleDidReceiveNewLegacyUlaPrefix(const uint8_t *aUlaPrefix);
  */
 void otNcpRegisterLegacyHandlers(const otNcpLegacyHandlers *aHandlers);
 
+void respondRequestSleep();
+
 /**
  * @}
  *

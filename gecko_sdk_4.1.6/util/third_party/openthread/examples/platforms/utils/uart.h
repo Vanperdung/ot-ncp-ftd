@@ -111,6 +111,8 @@ extern void otPlatUartSendDone(void);
  */
 extern void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength);
 
+extern void otRespondRequestSleep(void);
+
 /**
  * @}
  *

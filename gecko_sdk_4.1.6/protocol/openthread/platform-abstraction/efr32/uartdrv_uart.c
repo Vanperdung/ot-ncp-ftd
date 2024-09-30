@@ -175,8 +175,13 @@ static void processTransmit(void)
     otPlatUartSendDone();
 }
 
-void efr32UartProcess(void)
+void efr32UartProcess(bool *isReceiveACK)
 {
+    if (*isReceiveACK)
+    {
+        otRespondRequestSleep();
+        *isReceiveACK = false;
+    }
     processReceive();
     processTransmit();
 }
@@ -284,6 +289,11 @@ exit:
 }
 
 OT_TOOL_WEAK void otPlatUartSendDone(void)
+{
+    // do nothing
+}
+
+OT_TOOL_WEAK void otRespondRequestSleep(void)
 {
     // do nothing
 }

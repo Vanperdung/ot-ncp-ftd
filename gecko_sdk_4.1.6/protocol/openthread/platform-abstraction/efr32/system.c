@@ -106,7 +106,7 @@ void otSysDeinit(void)
 #endif
 }
 
-void otSysProcessDrivers(otInstance *aInstance)
+void otSysProcessDrivers(otInstance *aInstance, bool *isReceiveACK)
 {
     sInstance = aInstance;
 
@@ -116,7 +116,7 @@ void otSysProcessDrivers(otInstance *aInstance)
 #endif
 
 #if OPENTHREAD_CONFIG_NCP_HDLC_ENABLE
-    efr32UartProcess();
+    efr32UartProcess(isReceiveACK);
 #elif OPENTHREAD_CONFIG_NCP_CPC_ENABLE
     efr32CpcProcess();
 #elif OPENTHREAD_CONFIG_NCP_SPI_ENABLE

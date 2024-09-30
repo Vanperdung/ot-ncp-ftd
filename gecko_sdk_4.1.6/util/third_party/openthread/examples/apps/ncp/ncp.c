@@ -42,6 +42,11 @@ void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
     otNcpHdlcReceive(aBuf, aBufLength);
 }
 
+void otRespondRequestSleep(void)
+{
+    respondRequestSleep();
+}
+
 void otPlatUartSendDone(void)
 {
     otNcpHdlcSendDone();

@@ -1097,7 +1097,7 @@ otError NcpBase::HandleCommand(uint8_t aHeader)
 #endif // OPENTHREAD_MTD || OPENTHREAD_FTD
 
     case SPINEL_CMD_SGC_REQUEST_SLEEP:
-        error = CommandHandler_SLEEP_REQUEST(aHeader);
+        error = CommandHandler_REQUEST_SLEEP(aHeader);
         break;
 
     default:
@@ -1367,10 +1367,33 @@ exit:
 // MARK: Individual Command Handlers
 // ----------------------------------------------------------------------------
 
-otError NcpBase::CommandHandler_SLEEP_REQUEST(uint8_t aHeader)
+extern "C" void respondRequestSleep(void)
+{   
+    NcpBase *ncpBase = NcpBase::GetNcpInstance();
+
+    if (ncpBase != nullptr)
+    {
+        ncpBase->Respond_REQUEST_SLEEP();
+    }
+}
+
+void NcpBase::Respond_REQUEST_SLEEP(void)
+{
+    if (reqSleepHeader == 0)
+        return;
+
+    SuccessOrExit(mEncoder.BeginFrame(reqSleepHeader, SPINEL_CMD_SGC_REQUEST_SLEEP_RET));
+    SuccessOrExit(mEncoder.WriteUint8(1));
+    SuccessOrExit(mEncoder.EndFrame());
+    reqSleepHeader = 0;
+    return;
+exit:
+    PrepareLastStatusResponse(reqSleepHeader, SPINEL_STATUS_FAILURE);
+}
+
+otError NcpBase::CommandHandler_REQUEST_SLEEP(uint8_t aHeader)
 {
     otError  parseError    = OT_ERROR_NONE;
-    otError  responseError    = OT_ERROR_NONE;
     otMessage       *message = NULL;
     const otIp6Address *address;
     otMessageInfo    messageInfo;
@@ -1385,23 +1408,16 @@ otError NcpBase::CommandHandler_SLEEP_REQUEST(uint8_t aHeader)
     SuccessOrExit(otMessageAppend(message, REQUEST_SLEEP_MESSAGE, (uint16_t)strlen(REQUEST_SLEEP_MESSAGE)));
     SuccessOrExit(otUdpSend(gInstance, &sUdpSocket, message, &messageInfo));
 
-    
-
+    reqSleepHeader = aHeader;
     message = NULL;
-
-    SuccessOrExit(responseError = mEncoder.BeginFrame(aHeader, SPINEL_CMD_SGC_REQUEST_SLEEP_RET));
-    SuccessOrExit(responseError = mEncoder.WriteUint8(1));
-    SuccessOrExit(responseError = mEncoder.EndFrame());
-
-    return responseError;
+    return parseError;
 
 exit:
     if (message != NULL)
     {
         otMessageFree(message);
     }
-    responseError = PrepareLastStatusResponse(aHeader, ThreadErrorToSpinelStatus(parseError));
-    return responseError;
+    return PrepareLastStatusResponse(aHeader, SPINEL_STATUS_FAILURE);
 }
 
 otError NcpBase::CommandHandler_NOOP(uint8_t aHeader)

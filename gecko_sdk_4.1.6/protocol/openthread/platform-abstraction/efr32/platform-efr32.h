@@ -115,7 +115,7 @@ void efr32RadioProcess(otInstance *aInstance);
  * This function performs UART driver processing.
  *
  */
-void efr32UartProcess(void);
+void efr32UartProcess(bool *isReceiveACK);
 
 /**
  * This function performs CPC driver processing.

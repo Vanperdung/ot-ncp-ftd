@@ -414,8 +414,7 @@ protected:
 #if OPENTHREAD_CONFIG_MLE_LINK_METRICS_INITIATOR_ENABLE || OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE
     otError DecodeLinkMetrics(otLinkMetrics *aMetrics, bool aAllowPduCount);
 #endif
-
-    otError CommandHandler_SLEEP_REQUEST(uint8_t aHeader);
+    otError CommandHandler_REQUEST_SLEEP(uint8_t aHeader);
     otError CommandHandler_NOOP(uint8_t aHeader);
     otError CommandHandler_RESET(uint8_t aHeader);
     // Combined command handler for `VALUE_GET`, `VALUE_SET`, `VALUE_INSERT` and `VALUE_REMOVE`.
@@ -734,6 +733,10 @@ protected:
     bool mDidInitialUpdates;
 
     uint64_t mLogTimestampBase; // Timestamp base used for logging
+
+public:
+    uint8_t reqSleepHeader;
+    void Respond_REQUEST_SLEEP();
 };
 
 } // namespace Ncp

@@ -51,6 +51,7 @@ otInstance* gInstance = NULL;
 otUdpSocket sUdpSocket;
 bool isCreateUDP = false;
 bool isSleep = false;
+bool isReceiveACK = false;
 
 #ifndef LED_INSTANCE
 #define LED_INSTANCE    sl_led_pwr
@@ -121,20 +122,9 @@ void receiveCallback(void *aContext, otMessage *aMessage, const otMessageInfo *a
 
         message = NULL;
     }
-    else if (!strncmp((char *)buf, REQUEST_WAKEUP_MESSAGE, length) && isSleep)
+    else if (!strncmp((char *)buf, ACK, length))
     {
-        VerifyOrExit((message = otUdpNewMessage(otGetInstance(), NULL)) != NULL);
-        memset(&messageInfo, 0, sizeof(messageInfo));
-        memcpy(&messageInfo.mPeerAddr, &aMessageInfo->mPeerAddr, sizeof(otIp6Address));
-        messageInfo.mPeerPort = UDP_PORT;
-
-        sl_led_turn_off(&LED_INSTANCE);
-        isSleep = false;
-
-        SuccessOrExit(otMessageAppend(message, ACK, (uint16_t)strlen(ACK)));
-        SuccessOrExit(otUdpSend(otGetInstance(), &sUdpSocket, message, &messageInfo));
-
-        message = NULL;
+        isReceiveACK = true;
     }
 
 exit:
@@ -179,7 +169,7 @@ void initUdp(void)
 void app_process_action(void)
 {
     otTaskletsProcess(gInstance);
-    otSysProcessDrivers(gInstance);
+    otSysProcessDrivers(gInstance, &isReceiveACK);
     otDeviceRole role = otThreadGetDeviceRole(gInstance);
     if ((role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER || role == OT_DEVICE_ROLE_LEADER) && (!isCreateUDP)) 
     {

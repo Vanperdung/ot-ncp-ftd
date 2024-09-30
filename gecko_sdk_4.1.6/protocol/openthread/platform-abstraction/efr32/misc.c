@@ -139,7 +139,8 @@ OT_TOOL_WEAK void otCliPlatLogv(otLogLevel aLogLevel, otLogRegion aLogRegion, co
     // do nothing
 }
 
-OT_TOOL_WEAK void efr32UartProcess(void)
+OT_TOOL_WEAK void efr32UartProcess(bool *isReceiveACK)
 {
+    OT_UNUSED_VARIABLE(isReceiveACK);
     // do nothing
 }

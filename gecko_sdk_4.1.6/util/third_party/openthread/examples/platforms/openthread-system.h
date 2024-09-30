@@ -82,7 +82,7 @@ bool otSysPseudoResetWasRequested(void);
  * @param[in]  aInstance  The OpenThread instance structure.
  *
  */
-void otSysProcessDrivers(otInstance *aInstance);
+void otSysProcessDrivers(otInstance *aInstance, bool *isReceiveACK);
 
 /**
  * This function is called whenever platform drivers needs processing.
